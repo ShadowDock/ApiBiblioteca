@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:5050/biblioteca?createDatabaseIfNotExist=true
+    username: biblioteca
+    password: biblioteca
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    flyway: enabled
+  application:
+    name: ApiBiblioteca

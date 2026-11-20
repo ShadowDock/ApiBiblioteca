@@ -1,0 +1,16 @@
+services:
+  mysql:
+    image: docker.io/library/mysql:8.4
+    container_name: bibliote_api
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: biblioteca
+      MYSQL_USER: biblioteca
+      MYSQL_PASSWORD: biblioteca
+    ports:
+      - 5050:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
