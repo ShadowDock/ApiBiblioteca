@@ -4,9 +4,10 @@ import com.practiceTaks.ApiBiblioteca.domain.Author;
 import com.practiceTaks.ApiBiblioteca.dtos.mapper.AuthorMapper;
 import com.practiceTaks.ApiBiblioteca.dtos.request.AuthorRequest;
 import com.practiceTaks.ApiBiblioteca.dtos.response.AuthorResponse;
+import com.practiceTaks.ApiBiblioteca.exception.BusinessException;
 import com.practiceTaks.ApiBiblioteca.exception.ResourceNotFoundException;
 import com.practiceTaks.ApiBiblioteca.repository.AuthorRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -44,10 +45,13 @@ public class AuthorService {
     @Transactional
     public void deleteById(Long id) {
         Author author = findAuthorOrThrow(id);
+        if(!author.getBooks().isEmpty()) {
+            throw new BusinessException("Author " + author.getName() + " can't be deleted, because he has books created");
+        }
         authorRepository.delete(author);
     }
 
-    public Author findAuthorOrThrow(Long id) {
+    private Author findAuthorOrThrow(Long id) {
         return authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
     }

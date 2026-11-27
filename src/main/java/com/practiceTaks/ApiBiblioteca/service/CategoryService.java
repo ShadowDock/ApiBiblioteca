@@ -5,6 +5,7 @@ import com.practiceTaks.ApiBiblioteca.domain.Category;
 import com.practiceTaks.ApiBiblioteca.dtos.mapper.CategoryMapper;
 import com.practiceTaks.ApiBiblioteca.dtos.request.CategoryRequest;
 import com.practiceTaks.ApiBiblioteca.dtos.response.CategoryResponse;
+import com.practiceTaks.ApiBiblioteca.exception.BusinessException;
 import com.practiceTaks.ApiBiblioteca.exception.ResourceNotFoundException;
 import com.practiceTaks.ApiBiblioteca.repository.CategoryRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,9 @@ public class CategoryService {
 
     @Transactional
     public CategoryResponse create(CategoryRequest categoryRequest) {
+        if (categoryRepository.existsByName(categoryRequest.name())) {
+            throw new BusinessException("Category " + categoryRequest.name() + " already exists");
+        }
         Category category = categoryMapper.toEntity(categoryRequest);
         Category savedCategory = categoryRepository.save(category);
         return categoryMapper.toResponse(savedCategory);
@@ -42,6 +46,10 @@ public class CategoryService {
     @Transactional
     public CategoryResponse update(Long id, CategoryRequest categoryRequest) {
         Category category = findCategoryOrThrow(id);
+        boolean nameChanged = !category.getName().equals(categoryRequest.name());
+        if (nameChanged && categoryRepository.existsByName(categoryRequest.name())) {
+            throw new BusinessException("Category " + categoryRequest.name() + " already exists");
+        }
         categoryMapper.update(category, categoryRequest);
         return categoryMapper.toResponse(category);
     }
@@ -54,6 +62,6 @@ public class CategoryService {
 
     private Category findCategoryOrThrow(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category " + id + "not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category " + id + " not found"));
     }
 }
